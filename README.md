@@ -2,4 +2,5 @@
 Neo4j graph database with Py2Neo driver 
 
 TODO  
--Remove redundant "backward" relations
+- Remove redundant "backward" relations  
+- Integrate with d3.js
