@@ -4,14 +4,14 @@ from py2neo import Path, neo4j
 from py2neo import authenticate, Graph, Node, Relationship
 
 # set up authentication parameters
-authenticate("localhost:7474", "neo4j", "neo4j")
+authenticate("localhost:7474", "neo4j", "3bitbit")
 
 # connect to authenticated graph database
 sgraph = Graph()
 
 seqs = []
 scores = []
-
+THRESHOLD = 70
 
 #tx = sgraph.cypher.begin()
 
@@ -40,17 +40,15 @@ Let's create sample database with sequences and scores
 
 for seq in seqs:
 	list_of_nodes[seq.id] = sgraph.create({"name": seq.id})[0]
+	list_of_nodes[seq.id].add_labels("Protein")
 
-
-for record in scores:
-	rel = sgraph.create((list_of_nodes[record[0]], record[2], list_of_nodes[record[1]]))
-
-
-print list_of_nodes["U3CDF9_CALJA/1-64"]
-
-'''for pair in scores:
-	node1 = Node("Protein", name= pair[0])
-	node2 = Node("Protein", name= pair[1])
-	distance = Relationship(node1, pair[2], node2)
-	graph.create(distance)
 '''
+Remove "backwards" relations and remove pairs with similarity lower than 70
+'''
+uniq_scores = {d[:2]:d for d in scores if d[2] > THRESHOLD}
+uniq_scores = uniq_scores.values()
+
+print len(uniq_scores)
+
+for record in uniq_scores:
+	rel = sgraph.create((list_of_nodes[record[0]], record[2], list_of_nodes[record[1]]))
